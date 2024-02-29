@@ -1,0 +1,42 @@
+#https://kubernetes.github.io/ingress-nginx/deploy/rbac/
+
+# # Full-Access-Role (Warning Only for Testing)
+# # Vollzugriffs-Rolle (Warnung nur zu Testzwecken)
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   namespace: cert-manager
+#   name: cert-manager-full-access-role
+# rules:
+#   - apiGroups: [""]
+#     resources:
+#       [
+#         "pods",
+#         "services",
+#         "secrets",
+#         "configmaps",
+#         "endpoints",
+#         "ingresses",
+#         "events",
+#       ]
+#     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+#   - apiGroups: ["cert-manager.io"]
+#     resources:
+#       ["certificates", "certificaterequests", "clusterissuers", "issuers"]
+#     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+# Minimum-Access-Role / Mindest-Zugriffsrolle
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: cert-manager
+  name: cert-manager-role
+rules:
+  - apiGroups: ["cert-manager.io"]
+    resources: ["certificates"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+

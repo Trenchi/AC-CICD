@@ -1,0 +1,6 @@
+# https://kubernetes.io/docs/tasks/administer-cluster/namespaces-walkthrough/
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-cgi-ac-ns

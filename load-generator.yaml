@@ -1,0 +1,20 @@
+# CPU Load Generator for Scaling tests
+# CPU Last Generator für Skalierungsstests
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-load-generator
+spec:
+  containers:
+    - name: cpu-load-container
+      image: polinux/stress
+      command: ["/bin/sh", "-c"]
+      args:
+        - "stress --cpu 1 --timeout 300s"
+      resources:
+      limits:
+        cpu: "1000m"
+        memory: "512Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"

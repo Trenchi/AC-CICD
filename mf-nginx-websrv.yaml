@@ -1,0 +1,88 @@
+# NGINX WebServer with HealthChecks and resource limitation
+# NGINX WebServer mit HealthChecks und Ressourcenbegrenzung
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-websrv
+  namespace: dev-cgi-ac-ns
+  annotations:
+    author: "Maik <admin@mail.de>"
+
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nginx-websrv
+  template:
+    metadata:
+      labels:
+        app: nginx-websrv
+      annotations:
+        author: "Maik <admin@mail.de>"
+    spec:
+      containers:
+        - name: nginx-websrv
+          image: nginx:latest
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          readinessProbe: 
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15 
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+          volumeMounts:
+            - name: nginx-html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: nginx-html
+          configMap:
+            name: nginx-html
+            items:
+              - key: index.html
+                path: index.html
+
+---
+
+################################################################################################
+# Dieser Manifest-Code stellt einen Kubernetes-Service mit dem Namen "nginx-websrv" in dem     #
+# Namespace "dev-cgi-ac-ns" bereit. Der Service ist darauf konfiguriert, alle Pods mit         #
+# dem Label "app: nginx-websrv" über einen LoadBalancer auf dem externen Port 80 zu bedienen.  #
+# Achtung: Nur für Testzwecke gedacht um über Port 80 auf die Webseite zu gelangen.            #
+################################################################################################
+# This manifest code provides a Kubernetes service with the name "nginx-websrv" in the         #
+# namespace "dev-cgi-ac-ns". The service is configured to run all pods with                    #
+# the label "app: nginx-websrv" via a load balancer on the external port 80.                   #
+# Attention: Only intended for test purposes to access the website via port 80.                # 
+################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-websrv
+  namespace: dev-cgi-ac-ns
+spec:
+  selector:
+    app: nginx-websrv
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+  #type: LoadBalancer
